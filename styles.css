@@ -578,6 +578,13 @@ body[data-theme="dark"] .action-panel {
   line-height: 1.15;
 }
 
+.action-time {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
 .action-buttons {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

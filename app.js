@@ -15,6 +15,7 @@ const monthNames = [
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const girlfriendAnchor = Date.UTC(2026, 4, 18);
+const monikaWeekAnchor = Date.UTC(2026, 5, 1);
 const today = new Date();
 const editableStart = "2026-01-01";
 const editableEnd = "2026-12-31";
@@ -40,6 +41,7 @@ const themeToggle = document.querySelector("#themeToggle");
 const actionPanel = document.querySelector("#actionPanel");
 const actionDate = document.querySelector("#actionDate");
 const actionTitle = document.querySelector("#actionTitle");
+const actionTime = document.querySelector("#actionTime");
 const eventActions = document.querySelector("#eventActions");
 const addActions = document.querySelector("#addActions");
 const deleteEventButton = document.querySelector("#deleteEventButton");
@@ -403,7 +405,7 @@ function getEventMeta(event) {
 
 function openEventPanel(event) {
   selectedEvent = event;
-  showPanel(formatDateLabel(event.event_date), getEventTitle(event), "event");
+  showPanel(formatDateLabel(event.event_date), getEventTitle(event), "event", "", getEventHours(event));
 }
 
 function handleDayClick(dateKey) {
@@ -421,9 +423,11 @@ function handleDayClick(dateKey) {
   showPanel(formatDateLabel(dateKey), "Dodaj pracę", "add", dateKey);
 }
 
-function showPanel(dateLabel, title, mode, dateKey = "") {
+function showPanel(dateLabel, title, mode, dateKey = "", timeLabel = "") {
   actionDate.textContent = dateLabel;
   actionTitle.textContent = title;
+  actionTime.textContent = timeLabel;
+  actionTime.hidden = !timeLabel;
   actionPanel.dataset.date = dateKey;
   actionPanel.hidden = false;
   eventActions.hidden = mode !== "event";
@@ -624,6 +628,62 @@ function getEventTitle(event) {
   }
 
   return event.shift_type === "night" ? "Monika noc" : "Monika";
+}
+
+function getEventHours(event) {
+  if (event.person === "janek") {
+    return "Godziny pracy: 5:00-18:00";
+  }
+
+  if (event.person !== "monika") {
+    return "";
+  }
+
+  const date = fromDateKey(event.event_date);
+  const hours =
+    event.shift_type === "night" ? getMonikaNightHours(date) : getMonikaDayHours(date);
+
+  return `Godziny pracy: ${hours}`;
+}
+
+function getMonikaDayHours(date) {
+  if (isWeekend(date)) {
+    return "6:00-18:00";
+  }
+
+  return isMonikaEightOClockWeek(date) ? "8:00-18:00" : "6:00-16:00";
+}
+
+function getMonikaNightHours(date) {
+  if (isWeekendNight(date)) {
+    return "18:00-6:00";
+  }
+
+  return isMonikaEightOClockWeek(date) ? "20:00-6:00" : "18:00-4:00";
+}
+
+function isWeekend(date) {
+  const weekday = date.getUTCDay();
+  return weekday === 0 || weekday === 6;
+}
+
+function isWeekendNight(date) {
+  const weekday = date.getUTCDay();
+  return weekday === 0 || weekday === 5 || weekday === 6;
+}
+
+function isMonikaEightOClockWeek(date) {
+  const weekStart = getMondayStart(date);
+  const diffWeeks = Math.floor((weekStart.getTime() - monikaWeekAnchor) / (MS_PER_DAY * 7));
+
+  return modulo(diffWeeks, 2) === 0;
+}
+
+function getMondayStart(date) {
+  const mondayOffset = (date.getUTCDay() + 6) % 7;
+  return new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() - mondayOffset),
+  );
 }
 
 function formatDateLabel(dateKey) {
