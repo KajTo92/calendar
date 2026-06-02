@@ -23,8 +23,8 @@ const supabaseUrl = "https://byudwxxvponrnzseufmq.supabase.co";
 const supabaseAnonKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5dWR3eHh2cG9ucm56c2V1Zm1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMDQ2NzQsImV4cCI6MjA5NDY4MDY3NH0.BACoz0WksF5EwlNsng2P1dDYVnHgbgSOrMt2wPZNfXg";
 
-let visibleYear = 2026;
-let visibleMonth = 4;
+let visibleYear = today.getFullYear();
+let visibleMonth = today.getMonth();
 let storedEvents = [];
 let deletedEvents = [];
 let selectedEvent = null;
